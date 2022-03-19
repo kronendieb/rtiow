@@ -2,6 +2,12 @@
 # Created by https://www.toptal.com/developers/gitignore/api/cmake,c,c++,visualstudio,visualstudiocode
 # Edit at https://www.toptal.com/developers/gitignore?templates=cmake,c,c++,visualstudio,visualstudiocode
 
+#vscode config dir
+.vscode
+
+# Build Dir
+[Bb][Uu][Ii][Ll][Dd]
+
 ### C ###
 # Prerequisites
 *.d
