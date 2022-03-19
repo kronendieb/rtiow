@@ -1,0 +1,10 @@
+^E:\DOCUMENTS\REPOS\RTIOW\BUILD\CMAKEFILES\4F2BF613ABDFE954D85669C45D6F936B\GENERATE.STAMP.RULE
+setlocal
+"C:\Program Files\CMake\bin\cmake.exe" -SE:/Documents/Repos/rtiow/src -BE:/Documents/Repos/rtiow/build --check-stamp-list CMakeFiles/generate.stamp.list --vs-solution-file E:/Documents/Repos/rtiow/build/RTIOW.sln
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal & call :cmErrorLevel %errorlevel% & goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd
