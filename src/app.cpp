@@ -14,3 +14,14 @@ bool initApp(){
 
     return rtiow::defaultWindow != nullptr ? true : false;
 }
+
+void renderTriangle(){
+    float vertices[] = {
+        0.0f, 0.5f,
+        0.5f, -0.5f,
+        -0.5f, 0.5f
+    };
+
+    GLuint vbo;
+    glGenBuffers(1, &vbo);
+}
