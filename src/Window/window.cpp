@@ -1,7 +1,7 @@
 #include "window.h"
 #include "../app.h"
 
-Window rtiow::defaultWindow;
+Window rtiow::defaultWindow = NULL;
 std::vector<void(*)()> rtiow::actions;
 
 Window rtiow::initWindow(int* width, int* height, char* name){
@@ -11,7 +11,8 @@ Window rtiow::initWindow(int* width, int* height, char* name){
         return nullptr;
 
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 2);
+    glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
 
@@ -21,9 +22,22 @@ Window rtiow::initWindow(int* width, int* height, char* name){
         return nullptr;
     }
 
-
     glfwGetFramebufferSize(window, width, height);
-    glViewport(0, 0, *width, *height);
+    glViewport(0, 0, *width, *height); 
+    
+    glfwMakeContextCurrent(window);
+
+    glewExperimental = GL_TRUE;
+    GLenum err = glewInit();
+    if(err != GLEW_OK){
+        glfwTerminate();
+        return nullptr;
+    }
+
+    const GLubyte* renderer = glGetString(GL_RENDERER);
+    const GLubyte* version = glGetString(GL_VERSION);
+
+    printf("Renderer: %s\nVersion supported: %s\n", renderer, version);
 
     return window;
 }
@@ -32,18 +46,18 @@ bool rtiow::runWindow(Window window){
 
     glfwMakeContextCurrent(window);
     while (!glfwWindowShouldClose(window)){
-        glClear(GL_COLOR_BUFFER_BIT);
-
         glfwSwapBuffers(window);
+        glfwPollEvents();
+
+        glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         doActions();
-
-        glfwPollEvents();
     }
     return true;
 }
 
-void rtiow::terminateWindow(){
+void rtiow::closeWindow(){
     glfwTerminate();
 }
 

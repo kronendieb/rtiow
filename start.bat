@@ -1,2 +1,2 @@
-start ./build/Debug/RTIOW.exe
+start ./build/src/Debug/rtiow.exe
 pause
