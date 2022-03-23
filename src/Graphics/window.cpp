@@ -1,10 +1,13 @@
 #include "window.h"
 #include "../app.h"
 
-Window rtiow::defaultWindow = NULL;
-std::vector<void(*)()> rtiow::actions;
 
-Window rtiow::initWindow(int* width, int* height, char* name){
+namespace rtiow{
+
+Window defaultWindow = NULL;
+std::vector<RenderAction> actions;
+
+Window initWindow(int* width, int* height, char* name){
     Window window;
 
     if(!glfwInit())
@@ -26,6 +29,7 @@ Window rtiow::initWindow(int* width, int* height, char* name){
     glViewport(0, 0, *width, *height); 
     
     glfwMakeContextCurrent(window);
+    glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
 
     glewExperimental = GL_TRUE;
     GLenum err = glewInit();
@@ -39,10 +43,11 @@ Window rtiow::initWindow(int* width, int* height, char* name){
 
     printf("Renderer: %s\nVersion supported: %s\n", renderer, version);
 
+
     return window;
 }
 
-bool rtiow::runWindow(Window window){
+bool runWindow(Window window){
 
     glfwMakeContextCurrent(window);
     while (!glfwWindowShouldClose(window)){
@@ -57,19 +62,32 @@ bool rtiow::runWindow(Window window){
     return true;
 }
 
-void rtiow::closeWindow(){
+void closeWindow(){
     glfwTerminate();
 }
 
-void rtiow::addAction(void(* function)()){
-    actions.push_back(function);
+void framebuffer_size_callback(Window window, int width, int height){
+    glViewport(0, 0, width, height);
 }
 
-void rtiow::doAction(int index){
-    actions.at(index)();
+void addAction(RenderAction action){
+    actions.push_back(action);
 }
 
-void rtiow::doActions(){
-    for(auto& action : actions)
-        action();
+void doAction(int index){
+    glUseProgram(actions[index].m_shaderProgram);
+    glBindVertexArray(actions[index].m_vertexArrayObject);
+    actions[index].m_function();
+    glBindVertexArray(0);
+}
+
+void doActions(){
+    for(RenderAction action : actions){
+        glUseProgram(action.m_shaderProgram);
+        glBindVertexArray(action.m_vertexArrayObject);
+        action.m_function();
+        glBindVertexArray(0);
+    }
+}
+
 }

@@ -4,15 +4,20 @@
 #define APP_WIDTH 640
 #define APP_NAME "Hello World"
 
-#define GLEW_STATIC
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
+
+namespace rtiow{
 
 bool initApp();
 
 void getTextures();
-void renderTriangle();
+void renderTriangle(GLuint* vao, GLuint* vbo);
+void renderRectangle(GLuint *vao, GLuint *vbo, GLuint *ebo);
 
 void drawTriangle();
+void drawRectangle();
+void setWireframeMode();
 
+}
 #endif

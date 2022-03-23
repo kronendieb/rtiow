@@ -1,13 +1,14 @@
 #include <iostream>
 
+#define GLEW_STATIC
+#include <GL/glew.h>
+#include <GLFW/glfw3.h>
 #include "glm/glm.hpp"
-#include "adder.h"
 #include "app.h"
 #include "window.h"
-#include <GLFW/glfw3.h>
 
 int main(){
-    initApp();
+    rtiow::initApp();
 
     return 1;
 }

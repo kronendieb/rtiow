@@ -1,15 +1,22 @@
 #ifndef WINDOW_H
 #define WINDOW_H
 
-#define GLEW_STATIC
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 #include <vector>
+#include <functional>
 
-using Window = GLFWwindow*;
 namespace rtiow{
+
+    using Window = GLFWwindow*;
+    struct RenderAction{
+        void (*m_function)();
+        GLuint m_shaderProgram;
+        GLuint m_vertexArrayObject;
+    };
+
     extern Window defaultWindow;
-    extern std::vector<void(*)()> actions;
+    extern std::vector<RenderAction> actions;
     enum State {stateReady, stateRunning, stateExit};
 
     Window initWindow(int* width, int* height, char* name);
@@ -18,7 +25,11 @@ namespace rtiow{
 
     void closeWindow();
 
+    void framebuffer_size_callback(Window window, int width, int height);
+
     void addAction(void(* function)());
+    void addAction(RenderAction action);
+
 
     void doAction(int index);
     void doActions();

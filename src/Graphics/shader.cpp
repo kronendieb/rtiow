@@ -2,7 +2,9 @@
 #include <iostream>
 
 
-void rtiow::loadShader(char** shader, int* length, char* path){
+namespace rtiow{
+
+void loadShader(char** shader, int* length, char* path){
     FILE* f = fopen(path, "r");
 
     if(!f){
@@ -23,7 +25,7 @@ void rtiow::loadShader(char** shader, int* length, char* path){
 }
 
 
-GLuint rtiow::buildShader(char* path, ShaderType type){
+Shader buildShader(char* path, ShaderType type){
     char* shaderContent = NULL;
     int shaderLength = 0;
     GLuint shaderPtr = 0;
@@ -63,4 +65,51 @@ GLuint rtiow::buildShader(char* path, ShaderType type){
     }
 
     return shaderPtr;
+}
+
+Shader buildShaderProgram(std::vector<GLuint> shaders){
+
+    Shader shaderProgram = glCreateProgram();
+    for(auto s : shaders){
+        glAttachShader(shaderProgram, s);
+    }
+    glLinkProgram(shaderProgram);
+
+    for(auto s : shaders){
+        glDeleteShader(s);
+    }
+
+    return shaderProgram;
+}
+
+Shader  buildShaderProgram(const char* vertexPath, const char* fragmentPath){
+
+    std::vector<GLuint> shaders;
+    GLuint vshader = rtiow::buildShader((char*)vertexPath, ShaderType::VERTEX_S);
+    GLuint fshader = rtiow::buildShader((char*)fragmentPath, rtiow::ShaderType::FRAGMENT_S);
+
+    shaders.push_back(vshader);
+    shaders.push_back(fshader);
+
+    Shader s = buildShaderProgram(shaders);
+
+    return s;
+}
+
+void setBoolUniform(Shader shader, const char* name, bool value){
+    glUniform1i(glGetUniformLocation(shader, (const GLchar*)name), (int)value);
+}
+
+void setFloatUniform(Shader shader, const char* name, float value){
+    glUniform1i(glGetUniformLocation(shader, (const GLchar*)name), value);
+}
+
+void setIntUniform(Shader shader, const char* name, int value){
+    glUniform1f(glGetUniformLocation(shader, (const GLchar*)name), value);
+}
+
+void setVec3Uniform(Shader shader, const char* name, glm::vec3 value){
+    glUniform3f(glGetUniformLocation(shader, (const GLchar*) name), value.x, value.y, value.z);
+}
+    
 }
