@@ -51,13 +51,14 @@ bool runWindow(Window window){
 
     glfwMakeContextCurrent(window);
     while (!glfwWindowShouldClose(window)){
-        glfwSwapBuffers(window);
-        glfwPollEvents();
 
         glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         doActions();
+
+        glfwSwapBuffers(window);
+        glfwPollEvents();
     }
     return true;
 }
@@ -75,6 +76,7 @@ void addAction(RenderAction action){
 }
 
 void doAction(int index){
+    glBindTexture(GL_TEXTURE_2D, actions[index].m_texture);
     glUseProgram(actions[index].m_shaderProgram);
     glBindVertexArray(actions[index].m_vertexArrayObject);
     actions[index].m_function();
@@ -83,6 +85,7 @@ void doAction(int index){
 
 void doActions(){
     for(RenderAction action : actions){
+        glBindTexture(GL_TEXTURE_2D, action.m_texture);
         glUseProgram(action.m_shaderProgram);
         glBindVertexArray(action.m_vertexArrayObject);
         action.m_function();

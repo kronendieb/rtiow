@@ -13,6 +13,7 @@ namespace rtiow{
         void (*m_function)();
         GLuint m_shaderProgram;
         GLuint m_vertexArrayObject;
+        GLuint m_texture;
     };
 
     extern Window defaultWindow;
@@ -27,9 +28,7 @@ namespace rtiow{
 
     void framebuffer_size_callback(Window window, int width, int height);
 
-    void addAction(void(* function)());
     void addAction(RenderAction action);
-
 
     void doAction(int index);
     void doActions();

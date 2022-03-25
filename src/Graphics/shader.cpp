@@ -97,15 +97,15 @@ Shader  buildShaderProgram(const char* vertexPath, const char* fragmentPath){
 }
 
 void setBoolUniform(Shader shader, const char* name, bool value){
-    glUniform1i(glGetUniformLocation(shader, (const GLchar*)name), (int)value);
+    glUniform1i(glGetUniformLocation(shader, (const GLchar*)name), (GLint)value);
 }
 
 void setFloatUniform(Shader shader, const char* name, float value){
-    glUniform1i(glGetUniformLocation(shader, (const GLchar*)name), value);
+    glUniform1i(glGetUniformLocation(shader, (const GLchar*)name), (GLint)value);
 }
 
 void setIntUniform(Shader shader, const char* name, int value){
-    glUniform1f(glGetUniformLocation(shader, (const GLchar*)name), value);
+    glUniform1f(glGetUniformLocation(shader, (const GLchar*)name), (GLfloat)value);
 }
 
 void setVec3Uniform(Shader shader, const char* name, glm::vec3 value){

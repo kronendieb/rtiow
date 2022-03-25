@@ -13,7 +13,7 @@ bool initApp();
 
 void getTextures();
 void renderTriangle(GLuint* vao, GLuint* vbo);
-void renderRectangle(GLuint *vao, GLuint *vbo, GLuint *ebo);
+void renderRectangle(GLuint *vao, GLuint *vbo, GLuint *ebo, GLuint *tex);
 
 void drawTriangle();
 void drawRectangle();
