@@ -6,6 +6,7 @@
 
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
+#include "texture.h"
 
 namespace rtiow{
 
@@ -13,7 +14,7 @@ bool initApp();
 
 void getTextures();
 void renderTriangle(GLuint* vao, GLuint* vbo);
-void renderRectangle(GLuint *vao, GLuint *vbo, GLuint *ebo, GLuint *tex);
+void renderRectangle(GLuint *vao, GLuint *vbo, GLuint *ebo, Texture *tex);
 
 void drawTriangle();
 void drawRectangle();

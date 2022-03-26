@@ -1,9 +1,14 @@
 #include "app.h"
-#include "window.h"
-#include "shader.h"
+
 #include <iostream>
 #include <functional>
 #include <stdlib.h>
+
+#include "window.h"
+#include "shader.h"
+#include "texture.h"
+#include "ray.h"
+#include "raytracing.h"
 
 namespace rtiow{
 
@@ -18,7 +23,8 @@ bool initApp(){
     glfwMakeContextCurrent(defaultWindow);
 
     // Create buffers and buffer objects
-    GLuint vao, vbo, ebo, tex;
+    GLuint vao, vbo, ebo;
+    Texture tex;
     //renderTriangle(&vao, &vbo);
     renderRectangle(&vao, &vbo, &ebo, &tex);
 
@@ -47,7 +53,7 @@ bool initApp(){
     GLuint err = glGetError();
     err != 0 ? printf("Error: %d\n", err) : printf("there is no error\n");
 
-    RenderAction rectangle = {drawRectangle, shaderProgram, vao, tex};
+    RenderAction rectangle = {drawRectangle, shaderProgram, vao, tex.m_textureID};
 
     RenderAction wireframe = {[]{ // Set glPoligonMode to wireframe
     glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
@@ -88,7 +94,7 @@ void renderTriangle(GLuint *vao, GLuint *vbo){
 
 }
 
-void renderRectangle(GLuint *vao, GLuint *vbo, GLuint *ebo, GLuint *tex){
+void renderRectangle(GLuint *vao, GLuint *vbo, GLuint *ebo, Texture *tex){
     float vertices[] = {
          1.0f,  1.0f, 0.0f, /**/ 1.0f, 1.0f, 1.0f, /**/ 1.0f, 1.0f,
         -1.0f,  1.0f, 0.0f, /**/ 1.0f, 1.0f, 1.0f, /**/ 1.0f, 0.0f,
@@ -100,19 +106,15 @@ void renderRectangle(GLuint *vao, GLuint *vbo, GLuint *ebo, GLuint *tex){
         1, 2, 3
     };
 
-    const int width = 64;
-    const int height = 64;
+    const GLuint width = 256;
+    const GLuint height = 256;
+    const GLuint channels = 3;
 
-    int count = 0;
-    size_t textureSize = width * height * 3 * sizeof(float);
-    GLfloat* texture = (GLfloat*)malloc(textureSize);
-    for(int i = 0; i < width; i++){
-        for(int j = 0; j < height; j++){
-            texture[count++] = (1.0f / width) * i;
-            texture[count++] = (1.0f / height) * j;
-            texture[count++] = 0.5f;
-        }
-    }
+    GLfloat* texture = raytracingProcess(width, height, channels);
+
+    initTexture(tex, texture, width, height, channels);
+    free(texture);
+    texture = NULL;
 
 
     glGenVertexArrays(1, vao);
@@ -126,18 +128,9 @@ void renderRectangle(GLuint *vao, GLuint *vbo, GLuint *ebo, GLuint *tex){
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, *ebo);
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indeces), indeces, GL_STATIC_DRAW);
 
-    glGenTextures(1, tex);
-    glBindTexture(GL_TEXTURE_2D, *tex);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_FLOAT, texture);
-    glGenerateMipmap(GL_TEXTURE_2D);
-    glBindTexture(GL_TEXTURE_2D, 0);
-
-    free(texture);
-    texture = NULL;
+    generateTexture(tex);
+    bindTexture(tex);
+    freeTexture(tex);
 
 }
 
