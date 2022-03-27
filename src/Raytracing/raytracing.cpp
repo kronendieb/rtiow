@@ -1,49 +1,85 @@
 #include "raytracing.h"
 
 #include <glm/glm.hpp>
+#include <glm/gtx/norm.hpp>
+#include <vector>
+#include <memory>
+#include <limits>
+#include <cstdlib>
 #include "ray.h"
+#include "sphere.h"
+#include "camera.h"
 
 namespace rtiow{
-    
-    bool hit_sphere(const glm::vec3& center, float radius, const Ray& ray){
-        glm::vec3 oc = ray.origin - center;
-        auto a = glm::dot(ray.direction, ray.direction);
-        auto b = 2.0f * glm::dot(oc, ray.direction);
-        auto c = glm::dot(oc, oc) - radius * radius;
-        auto discriminant = b * b - 4 * a * c;
-        return discriminant > 0;
+
+    glm::vec3 sample_pixel(glm::vec3 in, int samples){
+        glm::vec3 newPix = in;
+        auto scale = 1.0f / samples;
+        newPix.x *= scale;
+        newPix.y *= scale;
+        newPix.z *= scale;
+        return newPix;
     }
 
-    glm::vec3 ray_color(const Ray& ray){
-        if(hit_sphere(glm::vec3(0.0f, 0.0f, -1.0f), 0.5f, ray))
-            return glm::vec3(1.0f, 0.5f, 0.5f);
+    float random_float(){
+        return rand() / (RAND_MAX + 1.0f);
+    }
+    
+    bool hit_any(const std::vector<Sphere>& world, const Ray& r, float t_min, float t_max, HitRecord& rec){
+        HitRecord temp;
+        bool hit_anything = false;
+        float closest = t_max;
+
+        for(Sphere sphere : world){
+            if(raycastHit(sphere, r, t_min, closest, &temp)){
+                
+                hit_anything = true;
+                closest = temp.t;
+                rec = temp;
+            }
+        }
+
+        return hit_anything;
+    }
+
+    glm::vec3 ray_color(const Ray& ray, std::vector<Sphere> world){
+        HitRecord rec;
+
+        if(hit_any(world, ray, 0, std::numeric_limits<float>::infinity(), rec)){
+            return 0.5f * (rec.normal + glm::vec3(1.0f, 1.0f, 1.0f));
+        }
+
         glm::vec3 unit_direction = glm::normalize(ray.direction);
-        auto t = 0.5f * (unit_direction.y + 1.0f);
+        float t = 0.5f * (unit_direction.y + 1.0f);
         return (1.0f - t) * glm::vec3(1.0f, 1.0f, 1.0f) + t * glm::vec3(0.5f, 0.7f, 1.0f);
     }
 
     GLfloat* raytracingProcess(GLuint width, GLuint height, GLuint channels){
+        int samples_per_pixel = 8;
         size_t resolution = width * height * channels;
         GLfloat* image = (GLfloat*)calloc(resolution, sizeof(GLfloat));
 
-        GLfloat vp_height = 2.0f; // the height of the viewport through camera
-        GLfloat vp_width = (16.0f / 9.0f) * vp_height; // the width of the viewport
-        GLfloat focal_length = 1.0f;
+        Camera camera = initCamera();
 
-        glm::vec3 origin = glm::vec3(0.0f, 0.0f, 0.0f);
-        glm::vec3 horizontal = glm::vec3(vp_width, 0.0f, 0.0f);
-        glm::vec3 vertical = glm::vec3(0.0f, vp_height, 0.0f);
-        glm::vec3 lower_left_corner = origin - horizontal / 2.0f - vertical / 2.0f - glm::vec3(0.0f, 0.0f, focal_length);
+        std::vector<Sphere> world;
+        Sphere s1 = {glm::vec3(0.0f, 0.0f, -1.0f), 0.5f};
+        Sphere s2 = {glm::vec3(0.0f, -100.5f, -1.0f), 100.0f};
+        world.push_back(s1);
+        world.push_back(s2);
 
         size_t count = 0;
         for(int i = 0; i < width; i++){
             for(int j = 0; j < height; j++){
-                auto u = float(i) / width;
-                auto v = float(j) / height;
+                glm::vec3 pixel_color = glm::vec3(0.0f, 0.0f, 0.0f);
+                for(int s = 0; s < samples_per_pixel; s++){
 
-                Ray r = {origin, lower_left_corner + u * horizontal + v * vertical - origin};
-                glm::vec3 pixel_color = ray_color(r);
+                    auto u = (i + random_float()) / (width - 1);
+                    auto v = (j + random_float()) / (height - 1);
 
+                    Ray r = get_ray(camera, u, v);
+                    pixel_color += ray_color(r, world);
+                }
+                pixel_color = sample_pixel(pixel_color, samples_per_pixel);
                 image[count++] = pixel_color.x;
                 image[count++] = pixel_color.y;
                 image[count++] = pixel_color.z;

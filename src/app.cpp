@@ -2,7 +2,10 @@
 
 #include <iostream>
 #include <functional>
-#include <stdlib.h>
+
+#define _CRTDBG_MAP_ALLOC
+#include <cstdlib>
+#include <crtdbg.h>
 
 #include "window.h"
 #include "shader.h"
@@ -57,7 +60,7 @@ bool initApp(){
 
     RenderAction wireframe = {[]{ // Set glPoligonMode to wireframe
     glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-    }, shaderProgram, vao};
+    }, shaderProgram, vao, tex.m_textureID};
 
     // Create buffers and add the action to draw
     addAction(rectangle);
@@ -73,6 +76,7 @@ bool initApp(){
 
     closeWindow();
 
+    _CrtDumpMemoryLeaks();
     return defaultWindow != nullptr;
 }
 
@@ -110,12 +114,10 @@ void renderRectangle(GLuint *vao, GLuint *vbo, GLuint *ebo, Texture *tex){
     const GLuint height = 256;
     const GLuint channels = 3;
 
-    GLfloat* texture = raytracingProcess(width, height, channels);
-
-    initTexture(tex, texture, width, height, channels);
-    free(texture);
-    texture = NULL;
-
+    tex->m_width = width;
+    tex->m_height = height;
+    tex->m_textureSize = width * height * channels;
+    tex->m_data = raytracingProcess(width, height, channels); // Run the process of raytracing on the image
 
     glGenVertexArrays(1, vao);
     glBindVertexArray(*vao);

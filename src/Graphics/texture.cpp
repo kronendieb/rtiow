@@ -3,13 +3,6 @@
 #include <iostream>
 
 namespace rtiow{
-    void initTexture(Texture* t, GLfloat* image, GLuint width, GLuint height, GLuint channels){
-        t->m_width = width;
-        t->m_height = height;
-        t->m_textureSize = width * height * channels;
-        t->m_data = (GLfloat*)calloc(t->m_textureSize, sizeof(GLfloat));
-        memcpy(t->m_data, image, t->m_textureSize * sizeof(GLfloat));
-    }
 
     void generateTexture(Texture* t){
         glGenTextures(1, &(*t).m_textureID);

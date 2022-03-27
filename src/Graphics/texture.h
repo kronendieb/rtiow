@@ -13,7 +13,6 @@ namespace rtiow{
         size_t m_textureSize;
     };
 
-    void initTexture(Texture* t, GLfloat* image, GLuint width, GLuint height, GLuint channels);
     void generateTexture(Texture* t);
     void bindTexture(Texture* t);
     void freeTexture(Texture* t);

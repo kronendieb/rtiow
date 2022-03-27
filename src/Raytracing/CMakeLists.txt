@@ -1,4 +1,4 @@
-add_library(raytracing STATIC ray.cpp raytracing.cpp)
+add_library(raytracing STATIC ray.cpp raytracing.cpp sphere.cpp hittable.cpp camera.cpp)
 
 target_include_directories(raytracing PUBLIC  ${MAIN_SRC_DIR})
 target_include_directories(raytracing PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
